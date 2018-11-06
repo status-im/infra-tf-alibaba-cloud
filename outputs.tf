@@ -1,5 +1,5 @@
 locals = {
-  public_ips = "${alicloud_instance.host.*.public_ip}"
+  public_ips = "${alicloud_eip.host.*.ip_address}"
   hostnames  = "${alicloud_instance.host.*.host_name}"
 }
 
