@@ -26,6 +26,13 @@ resource "alicloud_security_group" "host" {
   vpc_id      = "${data.alicloud_vpcs.host.vpcs.0.id}"
 }
 
+resource "alicloud_security_group_rule" "icmp" {
+  security_group_id = "${alicloud_security_group.host.id}"
+  type              = "ingress"
+  ip_protocol       = "icmp"
+  cidr_ip           = "0.0.0.0/0"
+}
+
 resource "alicloud_security_group_rule" "host_tcp" {
   security_group_id = "${alicloud_security_group.host.id}"
   type              = "ingress"
@@ -77,7 +84,7 @@ resource "alicloud_instance" "host" {
       playbook = {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
-      groups   = ["${var.group}"]
+      groups = ["${var.group}"]
       extra_vars = {
         hostname         = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
         ansible_ssh_user = "${var.ssh_user}"
