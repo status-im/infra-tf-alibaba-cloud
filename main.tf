@@ -76,7 +76,6 @@ resource "alicloud_instance" "host" {
   instance_type              = "${var.type}"
   system_disk_category       = "${var.disk}"
   count                      = "${var.count}"
-  internet_max_bandwidth_out = "${var.max_band_out}"
 
   /* costs */
   instance_charge_type       = "${var.charge}"
@@ -86,8 +85,9 @@ resource "alicloud_instance" "host" {
 }
 
 resource "alicloud_eip" "host" {
-  count      = "${var.count}"
-  lifecycle  = { prevent_destroy = true }
+  count     = "${var.count}"
+  bandwidth = "${var.max_band_out}"
+  lifecycle = { prevent_destroy = true }
 }
 
 /**

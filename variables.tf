@@ -30,7 +30,7 @@ variable disk {
 
 variable max_band_out {
   description = "Maximum outgoing bandwidth to the public network, measured in Mbps."
-  default     = 30
+  default     = 20
 }
 
 /* FIREWALL -------------------------------------*/
