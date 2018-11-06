@@ -1,5 +1,9 @@
 /* SCALING --------------------------------------*/
 
+variable count {
+  description = "Number of instances to start in this region."
+}
+
 variable image {
   /**
    * This image is created with Packer because Alicloud does not provide one
@@ -29,14 +33,10 @@ variable max_band_out {
   default     = 30
 }
 
-variable count {
-  description = "Number of instances to start in this region."
-}
-
 /* FIREWALL -------------------------------------*/
 
 variable open_ports {
-  description = "Port ranges to enable access to through security group."
+  description = "Ports to enable access to through security group."
   type        = "list"
   default     = []
 }
@@ -45,7 +45,7 @@ variable open_ports {
 
 variable provider {
   description = "Short name of provider being used."
-  # Digital Ocean
+  /* Digital Ocean */
   default     = "ac"
 }
 
@@ -56,13 +56,13 @@ variable name {
 
 variable charge {
   description = "Way in which the instance is paid for."
-  # The other value is PrePaid
+  /* The other value is PrePaid */
   default     = "PostPaid"
 }
 
 variable period {
   description = "Time period in which we pay for instances."
-  # The other value is Week
+  /* The other value is Week */
   default     = "Month"
 }
 
