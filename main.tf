@@ -105,26 +105,26 @@ resource "alicloud_eip_association" "host" {
    * It is necessary to provision here instead of in alicloud_instance
    * because Alibaba Cloud instances do not have public IPs by default
    **/
-  #provisioner "ansible" {
-  #  connection {
-  #    host = "${element(alicloud_eip.host.*.ip_address, count.index)}"
-  #    user = "${var.ssh_user}"
-  #  }
-  #
-  #  plays {
-  #    playbook = {
-  #      file_path = "${path.cwd}/ansible/bootstrap.yml"
-  #    }
-  #    groups = ["${var.group}"]
-  #    extra_vars = {
-  #      hostname         = "${element(alicloud_instance.host.*.host_name, count.index)}"
-  #      ansible_ssh_user = "${var.ssh_user}"
-  #      data_center      = "${local.dc}"
-  #      stage            = "${local.stage}"
-  #      env              = "${var.env}"
-  #    }
-  #  }
-  #}
+  provisioner "ansible" {
+    connection {
+      host = "${element(alicloud_eip.host.*.ip_address, count.index)}"
+      user = "${var.ssh_user}"
+    }
+  
+    plays {
+      playbook = {
+        file_path = "${path.cwd}/ansible/bootstrap.yml"
+      }
+      groups = ["${var.group}"]
+      extra_vars = {
+        hostname         = "${element(alicloud_instance.host.*.host_name, count.index)}"
+        ansible_ssh_user = "${var.ssh_user}"
+        data_center      = "${local.dc}"
+        stage            = "${local.stage}"
+        env              = "${var.env}"
+      }
+    }
+  }
 }
 
 resource "cloudflare_record" "host" {
