@@ -33,6 +33,11 @@ variable max_band_out {
   default     = 50
 }
 
+variable vol_size {
+  description = "Size in GiB of an extra Volume to attach to the instance."
+  default     = 0
+}
+
 /* FIREWALL -------------------------------------*/
 
 variable open_ports {

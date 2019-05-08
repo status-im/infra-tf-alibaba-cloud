@@ -84,6 +84,29 @@ resource "alicloud_instance" "host" {
   /* NOTE: We provision inside Elastic IP association */
 }
 
+/* Optional resource when vol_size is set */
+resource "alicloud_disk" "host" {
+  # cn-beijing
+  availability_zone = "${var.zone}"
+  name              = "data.${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+  description       = "Extra data volume created by Terraform."
+  category          = "cloud_ssd"
+  size              = "${var.vol_size}"
+  count             = "${var.vol_size > 0 ? var.count : 0}"
+
+  tags {
+    stage = "${local.stage}"
+    group = "${var.group}"
+    env   = "${var.env}"
+  }
+}
+
+resource "alicloud_disk_attachment" "host" {
+  disk_id     = "${alicloud_disk.host.id}"
+  instance_id = "${alicloud_instance.host.id}"
+  count       = "${var.vol_size > 0 ? var.count : 0}"
+}
+
 resource "alicloud_eip" "host" {
   count     = "${var.count}"
   bandwidth = "${var.max_band_out}"
