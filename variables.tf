@@ -38,14 +38,6 @@ variable vol_size {
   default     = 0
 }
 
-/* FIREWALL -------------------------------------*/
-
-variable open_ports {
-  description = "Ports to enable access to through security group."
-  type        = "list"
-  default     = []
-}
-
 /* GENERAL --------------------------------------*/
 
 variable provider {
@@ -92,4 +84,19 @@ variable key_pair {
   description = "SSH key pair used to log in to instance"
   /* WARNING I really shouldn't use my own key here */
   default     = "jakub_status.im"
+}
+
+/* FIREWALL -------------------------------------*/
+
+variable open_ports {
+  description = "Ports to enable access to through security group."
+  type        = "list"
+  default     = []
+}
+
+/* See: https://www.terraform.io/docs/providers/alicloud/d/security_group_rules.html */
+variable blocked_ips {
+  description = "List of source IP ranges for which we want to block access."
+  type        = "list"
+  default     = []
 }
