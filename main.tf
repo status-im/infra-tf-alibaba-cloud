@@ -31,14 +31,14 @@ resource "alicloud_security_group_rule" "icmp" {
   security_group_id = "${alicloud_security_group.host.id}"
   type              = "ingress"
   ip_protocol       = "icmp"
-  source_cidr_ip    = "0.0.0.0/0"
+  cidr_ip           = "0.0.0.0/0"
 }
 
 resource "alicloud_security_group_rule" "tcp" {
   security_group_id = "${alicloud_security_group.host.id}"
   type              = "ingress"
   ip_protocol       = "tcp"
-  source_cidr_ip    = "0.0.0.0/0"
+  cidr_ip           = "0.0.0.0/0"
   port_range        = "${replace(element(local.open_ports, count.index), "-", "/")}"
   count             = "${length(local.open_ports)}"
 }
@@ -47,7 +47,7 @@ resource "alicloud_security_group_rule" "udp" {
   security_group_id = "${alicloud_security_group.host.id}"
   type              = "ingress"
   ip_protocol       = "udp"
-  source_cidr_ip    = "0.0.0.0/0"
+  cidr_ip           = "0.0.0.0/0"
   port_range        = "${replace(element(local.open_ports, count.index), "-", "/")}"
   count             = "${length(local.open_ports)}"
 }
@@ -55,7 +55,7 @@ resource "alicloud_security_group_rule" "blocked_ips" {
   security_group_id = "${alicloud_security_group.host.id}"
   type              = "ingress"
   ip_protocol       = "all"
-  source_cidr_ip    = "${element(var.blocked_ips, count.index)}"
+  cidr_ip           = "${element(var.blocked_ips, count.index)}"
   count             = "${length(var.blocked_ips)}"
 }
 
