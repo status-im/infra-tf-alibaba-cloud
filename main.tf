@@ -1,20 +1,25 @@
 /* DERIVED --------------------------------------*/
+
 locals {
-  stage      = "${terraform.workspace}"
-  tokens     = "${split(".", local.stage)}"
-  dc         = "${var.provider}-${var.zone}"
-  /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports = [
-    "22/22", "655/655", "8000/8000", "8301/8301",
-    "${var.open_ports}",
+  stage  = terraform.workspace
+  tokens = split(".", local.stage)
+  dc     = "${var.provider_name}-${var.zone}"
+  /* convert ports to port ranges, as requried by port_range argument */
+  ports = [
+    for port in var.open_ports:
+    (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}" )
   ]
+  /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
+  open_ports = concat(["22/22", "655/655", "8000/8000", "8301/8301"], local.ports)
 }
+
 /* RESOURCES ------------------------------------*/
 
 /* default vpc to avoid creating by hand */
 data "alicloud_vpcs" "host" {
   is_default = true
 }
+
 /* default vswitch to avoid creating by hand */
 data "alicloud_vswitches" "host" {
   is_default = true
@@ -23,101 +28,103 @@ data "alicloud_vswitches" "host" {
 resource "alicloud_security_group" "host" {
   name        = "sg-${var.env}-${local.stage}"
   description = "Sec Group via Terraform"
-  vpc_id      = "${data.alicloud_vpcs.host.vpcs.0.id}"
+  vpc_id      = data.alicloud_vpcs.host.vpcs[0].id
 }
 
 /* WARNING: Using 'all' protocol fucks with port_range option */
 resource "alicloud_security_group_rule" "icmp" {
-  security_group_id = "${alicloud_security_group.host.id}"
+  security_group_id = alicloud_security_group.host.id
   type              = "ingress"
   ip_protocol       = "icmp"
   cidr_ip           = "0.0.0.0/0"
 }
 
 resource "alicloud_security_group_rule" "tcp" {
-  security_group_id = "${alicloud_security_group.host.id}"
+  security_group_id = alicloud_security_group.host.id
   type              = "ingress"
   ip_protocol       = "tcp"
   cidr_ip           = "0.0.0.0/0"
-  port_range        = "${replace(element(local.open_ports, count.index), "-", "/")}"
-  count             = "${length(local.open_ports)}"
+  port_range        = replace(local.open_ports[count.index], "-", "/")
+  count             = length(local.open_ports)
 }
 
 resource "alicloud_security_group_rule" "udp" {
-  security_group_id = "${alicloud_security_group.host.id}"
+  security_group_id = alicloud_security_group.host.id
   type              = "ingress"
   ip_protocol       = "udp"
   cidr_ip           = "0.0.0.0/0"
-  port_range        = "${replace(element(local.open_ports, count.index), "-", "/")}"
-  count             = "${length(local.open_ports)}"
+  port_range        = replace(local.open_ports[count.index], "-", "/")
+  count             = length(local.open_ports)
 }
+
 resource "alicloud_security_group_rule" "blocked_ips" {
-  security_group_id = "${alicloud_security_group.host.id}"
+  security_group_id = alicloud_security_group.host.id
   type              = "ingress"
   ip_protocol       = "all"
-  cidr_ip           = "${element(var.blocked_ips, count.index)}"
-  count             = "${length(var.blocked_ips)}"
+  cidr_ip           = var.blocked_ips[count.index]
+  count             = length(var.blocked_ips)
 }
 
 data "alicloud_images" "host" {
-  owners = "self"
-  name_regex = "${var.image}"
+  owners     = "self"
+  name_regex = var.image
 }
 
 resource "alicloud_instance" "host" {
-  host_name       = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
-  instance_name   = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+  host_name     = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
+  instance_name = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
 
-  security_groups = ["${alicloud_security_group.host.id}"]
-  image_id        = "${data.alicloud_images.host.images.0.id}"
-  vswitch_id      = "${data.alicloud_vswitches.host.vswitches.0.id}"
+  security_groups = [alicloud_security_group.host.id]
+  image_id        = data.alicloud_images.host.images[0].id
+  vswitch_id      = data.alicloud_vswitches.host.vswitches[0].id
 
   tags = {
-    stage = "${local.stage}"
-    group = "${var.group}"
-    env   = "${var.env}"
+    stage = local.stage
+    group = var.group
+    env   = var.env
   }
 
-  key_name                   = "${var.key_pair}"
-  availability_zone          = "${var.zone}"
-  instance_type              = "${var.type}"
-  system_disk_category       = "${var.disk}"
-  count                      = "${var.count}"
+  key_name             = var.key_pair
+  availability_zone    = var.zone
+  instance_type        = var.type
+  system_disk_category = var.disk
+  count                = var.host_count
 
   /* costs */
-  instance_charge_type       = "${var.charge}"
-  period_unit                = "${var.period}"
-
+  instance_charge_type = var.charge
+  period_unit          = var.period
   /* NOTE: We provision inside Elastic IP association */
 }
 
 /* Optional resource when vol_size is set */
 resource "alicloud_disk" "host" {
   # cn-beijing
-  availability_zone = "${var.zone}"
-  name              = "data.${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+  availability_zone = var.zone
+  name              = "data.${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
   description       = "Extra data volume created by Terraform."
   category          = "cloud_ssd"
-  size              = "${var.vol_size}"
-  count             = "${var.vol_size > 0 ? var.count : 0}"
+  size              = var.vol_size
+  count             = var.vol_size > 0 ? var.host_count : 0
 
-  tags {
-    stage = "${local.stage}"
-    group = "${var.group}"
-    env   = "${var.env}"
+  tags = {
+    stage = local.stage
+    group = var.group
+    env   = var.env
   }
 }
 
 resource "alicloud_disk_attachment" "host" {
-  disk_id     = "${alicloud_disk.host.id}"
-  instance_id = "${alicloud_instance.host.id}"
-  count       = "${var.vol_size > 0 ? var.count : 0}"
+  disk_id     = alicloud_disk.host[0].id
+  instance_id = alicloud_instance.host[0].id
+  count       = var.vol_size > 0 ? var.host_count : 0
 }
 
 resource "alicloud_eip" "host" {
-  count     = "${var.count}"
-  bandwidth = "${var.max_band_out}"
-  lifecycle = { prevent_destroy = true }
+  count     = var.host_count
+  bandwidth = var.max_band_out
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 /**
@@ -127,9 +134,9 @@ resource "alicloud_eip" "host" {
  * https://www.terraform.io/docs/providers/alicloud/r/eip_association.html
  **/
 resource "alicloud_eip_association" "host" {
-  allocation_id = "${element(alicloud_eip.host.*.id, count.index)}"
-  instance_id   = "${element(alicloud_instance.host.*.id, count.index)}"
-  count         = "${var.count}"
+  allocation_id = alicloud_eip.host[count.index].id
+  instance_id   = alicloud_instance.host[count.index].id
+  count         = var.host_count
 
   /**
    * It is necessary to provision here instead of in alicloud_instance
@@ -137,47 +144,50 @@ resource "alicloud_eip_association" "host" {
    **/
   provisioner "ansible" {
     connection {
-      host = "${element(alicloud_eip.host.*.ip_address, count.index)}"
-      user = "${var.ssh_user}"
+      host = alicloud_eip.host[count.index].ip_address
+      user = var.ssh_user
     }
-  
+
     plays {
-      playbook = {
+      playbook {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
-      groups = ["${var.group}"]
+      groups = [var.group]
       extra_vars = {
-        hostname         = "${element(alicloud_instance.host.*.host_name, count.index)}"
-        ansible_ssh_user = "${var.ssh_user}"
-        data_center      = "${local.dc}"
-        stage            = "${local.stage}"
-        env              = "${var.env}"
+        hostname         = alicloud_instance.host[count.index].host_name
+        ansible_ssh_user = var.ssh_user
+        data_center      = local.dc
+        stage            = local.stage
+        env              = var.env
       }
     }
   }
 }
 
 resource "cloudflare_record" "host" {
-  domain = "${var.domain}"
-  count  = "${var.count}"
-  name   = "${element(alicloud_instance.host.*.host_name, count.index)}"
-  value  = "${element(alicloud_eip.host.*.ip_address, count.index)}"
+  domain = var.domain
+  count  = var.host_count
+  name   = alicloud_instance.host[count.index].host_name
+  value  = alicloud_eip.host[count.index].ip_address
   type   = "A"
   ttl    = 3600
 }
 
 resource "ansible_host" "host" {
-  inventory_hostname = "${element(alicloud_instance.host.*.host_name, count.index)}"
-  groups = ["${var.group}", "${local.dc}"]
-  count = "${var.count}"
-  vars {
-    ansible_host = "${element(alicloud_eip.host.*.ip_address, count.index)}"
-    hostname     = "${element(alicloud_instance.host.*.host_name, count.index)}"
-    region       = "${element(alicloud_instance.host.*.availability_zone, count.index)}"
-    dns_entry    = "${element(alicloud_instance.host.*.host_name, count.index)}.${var.domain}"
-    dns_domain   = "${var.domain}"
-    data_center  = "${local.dc}"
-    stage        = "${local.stage}"
-    env          = "${var.env}"
+  inventory_hostname = alicloud_instance.host[count.index].host_name
+
+  groups = [var.group, local.dc]
+  count  = var.host_count
+
+  vars = {
+    ansible_host = alicloud_eip.host[count.index].ip_address
+    hostname     = alicloud_instance.host[count.index].host_name
+    region       = alicloud_instance.host[count.index].availability_zone
+    dns_entry    = "${alicloud_instance.host[count.index].host_name}.${var.domain}"
+    dns_domain   = var.domain
+    data_center  = local.dc
+    stage        = local.stage
+    env          = var.env
   }
 }
+
