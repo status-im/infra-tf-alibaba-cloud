@@ -4,8 +4,13 @@ locals {
   stage  = terraform.workspace
   tokens = split(".", local.stage)
   dc     = "${var.provider_name}-${var.zone}"
+  /* convert ports to port ranges, as requried by port_range argument */
+  ports = [
+    for port in var.open_ports:
+    (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}" )
+  ]
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports = concat(["22/22", "655/655", "8000/8000", "8301/8301"], var.open_ports)
+  open_ports = concat(["22/22", "655/655", "8000/8000", "8301/8301"], local.ports)
 }
 
 /* RESOURCES ------------------------------------*/
