@@ -4,11 +4,11 @@ locals {
 }
 
 output "public_ips" {
-  value = [local.public_ips]
+  value = local.public_ips
 }
 
 output "hostnames" {
-  value = [local.hostnames]
+  value = local.hostnames
 }
 
 output "hosts" {
