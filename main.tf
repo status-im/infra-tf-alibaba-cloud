@@ -152,9 +152,12 @@ resource "alicloud_eip_association" "host" {
       playbook {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
+
+      hosts  = [self.ip_address]
       groups = [var.group]
+
       extra_vars = {
-        hostname         = alicloud_instance.host[count.index].host_name
+        hostname         = self.host_name
         ansible_ssh_user = var.ssh_user
         data_center      = local.dc
         stage            = local.stage
