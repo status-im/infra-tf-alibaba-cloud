@@ -168,12 +168,12 @@ resource "alicloud_eip_association" "host" {
 }
 
 resource "cloudflare_record" "host" {
-  domain = var.domain
-  count  = var.host_count
-  name   = alicloud_instance.host[count.index].host_name
-  value  = alicloud_eip.host[count.index].ip_address
-  type   = "A"
-  ttl    = 3600
+  zone_id = var.cf_zone_id
+  count   = var.host_count
+  name    = alicloud_instance.host[count.index].host_name
+  value   = alicloud_eip.host[count.index].ip_address
+  type    = "A"
+  ttl     = 3600
 }
 
 resource "ansible_host" "host" {
