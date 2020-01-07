@@ -153,7 +153,7 @@ resource "alicloud_eip_association" "host" {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
 
-      hosts  = [alicloud_instance.host[count.index].ip_address]
+      hosts  = [alicloud_instance.host[count.index].public_ip]
       groups = [var.group]
 
       extra_vars = {
