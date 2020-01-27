@@ -5,12 +5,17 @@ locals {
   tokens = split(".", local.stage)
   dc     = "${var.provider_name}-${var.zone}"
   /* convert ports to port ranges, as requried by port_range argument */
-  ports = [
-    for port in var.open_ports:
+  tcp_ports = [
+    for port in var.open_tcp_ports:
+    (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}" )
+  ]
+  udp_ports = [
+    for port in var.open_udp_ports:
     (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}" )
   ]
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports = concat(["22/22", "655/655", "8000/8000", "8301/8301"], local.ports)
+  open_tcp_ports = concat(["22/22", "655/655", "8000/8000", "8301/8301"], local.tcp_ports)
+  open_udp_ports = concat(["8301/8301"], local.udp_ports)
 }
 
 /* RESOURCES ------------------------------------*/
@@ -44,8 +49,8 @@ resource "alicloud_security_group_rule" "tcp" {
   type              = "ingress"
   ip_protocol       = "tcp"
   cidr_ip           = "0.0.0.0/0"
-  port_range        = replace(local.open_ports[count.index], "-", "/")
-  count             = length(local.open_ports)
+  port_range        = replace(local.open_tcp_ports[count.index], "-", "/")
+  count             = length(local.open_tcp_ports)
 }
 
 resource "alicloud_security_group_rule" "udp" {
@@ -53,8 +58,8 @@ resource "alicloud_security_group_rule" "udp" {
   type              = "ingress"
   ip_protocol       = "udp"
   cidr_ip           = "0.0.0.0/0"
-  port_range        = replace(local.open_ports[count.index], "-", "/")
-  count             = length(local.open_ports)
+  port_range        = replace(local.open_udp_ports[count.index], "-", "/")
+  count             = length(local.open_udp_ports)
 }
 
 resource "alicloud_security_group_rule" "blocked_ips" {

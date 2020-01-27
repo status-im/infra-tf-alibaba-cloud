@@ -33,5 +33,6 @@ module "alibaba-cloud" {
 * __Security__
   * `ssh_user` - User used to log in to instance (default: `root`)
   * `key_pair` - SSH key pair used to log in to instance. (default: `jakub_status.im`)
-  * `open_ports` - Port ranges to enable access from outside. Format: `N-N` (default: `[]`)
+  * `open_tcp_ports` - TCP port ranges to enable access from outside. Format: `N-N` (default: `[]`)
+  * `open_udp_ports` - UDL port ranges to enable access from outside. Format: `N-N` (default: `[]`)
   * `blocked_ips` - List of blocked IP ranges. Format: [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) (default: `[]`)

@@ -100,8 +100,14 @@ variable "key_pair" {
 
 /* FIREWALL -------------------------------------*/
 
-variable "open_ports" {
-  description = "Ports to enable access to through security group."
+variable "open_tcp_ports" {
+  description = "TCP ports to enable access to through security group."
+  type        = list(string)
+  default     = []
+}
+
+variable "open_udp_ports" {
+  description = "UDP ports to enable access to through security group."
   type        = list(string)
   default     = []
 }
@@ -112,4 +118,3 @@ variable "blocked_ips" {
   type        = list(string)
   default     = []
 }
-
