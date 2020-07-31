@@ -94,6 +94,11 @@ resource "alicloud_instance" "host" {
   system_disk_category = var.disk
   count                = var.host_count
 
+  /* Ignore changes to disk image */
+  lifecycle {
+    ignore_changes = [ image_id ]
+  }
+
   /* costs */
   instance_charge_type = var.charge
   period_unit          = var.period
