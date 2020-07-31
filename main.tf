@@ -71,7 +71,6 @@ resource "alicloud_security_group_rule" "blocked_ips" {
 }
 
 data "alicloud_images" "host" {
-  owners     = "self"
   name_regex = var.image
 }
 
