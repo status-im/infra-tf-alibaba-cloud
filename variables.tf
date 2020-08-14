@@ -45,8 +45,8 @@ variable "max_band_out" {
   default     = 50
 }
 
-variable "vol_size" {
-  description = "Size in GiB of an extra Volume to attach to the instance."
+variable "data_vol_size" {
+  description = "Size in GiB of an extra data volume to attach to the instance."
   type        = number
   default     = 0
 }
