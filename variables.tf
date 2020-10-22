@@ -14,11 +14,11 @@ variable "host_count" {
   type        = number
 }
 
+/* Run: aliyun ecs DescribeImages --output 'cols=ImageName' 'rows=Images.Image[]' --pager --ImageName = 'ubuntu*' */
 variable "image" {
   description = "OS image used to create instance."
   type        = string
-  /* Run: aliyun ecs DescribeImages --output 'cols=ImageName' 'rows=Images.Image[]' --pager --ImageName='ubuntu*' */
-  default     = "ubuntu_20_04_x64_20G_alibase_20200522.vhd"
+  default     = "ubuntu_20_04_x64_20G_alibase_20200914.vhd"
 }
 
 variable "type" {
