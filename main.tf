@@ -1,7 +1,7 @@
 /* DERIVED --------------------------------------*/
 
 locals {
-  stage  = terraform.workspace
+  stage  = var.stage != "" ? var.stage : terraform.workspace
   tokens = split(".", local.stage)
   dc     = "${var.provider_name}-${var.zone}"
   /* convert ports to port ranges, as requried by port_range argument */
