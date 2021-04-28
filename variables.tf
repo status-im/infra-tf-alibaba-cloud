@@ -18,7 +18,7 @@ variable "host_count" {
 variable "image" {
   description = "OS image used to create instance."
   type        = string
-  default     = "ubuntu_20_04_x64_20G_alibase_20210318.vhd"
+  default     = "ubuntu_20_04_x64_20G_alibase_20210420.vhd"
 }
 
 variable "type" {
