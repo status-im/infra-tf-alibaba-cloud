@@ -17,7 +17,7 @@ module "alibaba-cloud" {
 
 * __Scaling__
   * `host_count` - Number of hosts to start in this zone.
-  * `image` - OS image used to create host. (default: `ubuntu_18_04_64_custom_20180719`)
+  * `image_regex` - Regex for image used to create host. (default: `ubuntu_20_04_x64_20G_alibase_.*.vhd`)
   * `type` - Type of machine to deploy. (default: `ecs.t5-lc2m1.nano`)
   * `zone` - Specific zone in which to deploy hosts. (default: `cn-hongkong-c`)
   * `max_band_out` - Maximum outgoing bandwidth to the public network, measured in Mbps. (default: `30`)
