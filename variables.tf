@@ -3,8 +3,7 @@
 variable "cf_zone_id" {
   description = "ID of CloudFlare zone for host record."
   type        = string
-  /* We default to: statusim.net */
-  default     = "14660d10344c9898521c4ba49789f563"
+  default     = "14660d10344c9898521c4ba49789f563" /* statusim.net */
 }
 
 /* SCALING --------------------------------------*/
@@ -14,11 +13,11 @@ variable "host_count" {
   type        = number
 }
 
-/* Run: aliyun ecs DescribeImages --output 'cols=ImageName' 'rows=Images.Image[]' --pager --ImageName='ubuntu*' */
 variable "image_regex" {
   description = "Regex for OS image used to create instance."
   type        = string
   default     = "ubuntu_20_04_x64_20G_alibase_.*.vhd"
+  /* cmd: `aliyun ecs DescribeImages --output 'cols=ImageName' 'rows=Images.Image[]' --pager --ImageName='ubuntu*'` */
 }
 
 variable "type" {
@@ -68,13 +67,13 @@ variable "name" {
 variable "charge" {
   description = "Way in which the instance is paid for."
   type        = string
-  default     = "PostPaid" /* The other value is PrePaid */
+  default     = "PostPaid" /* Other: PrePaid */
 }
 
 variable "period" {
   description = "Time period in which we pay for instances."
   type        = string
-  default     = "Month" /* The other value is Week */
+  default     = "Month" /* Other: Week */
 }
 
 variable "group" {
@@ -107,8 +106,7 @@ variable "ssh_user" {
 variable "key_pair" {
   description = "SSH key pair used to log in to instance"
   type        = string
-  /* WARNING I really shouldn't use my own key here */
-  default = "jakub_status.im"
+  default     = "jakub_status.im" /* TODO: I really shouldn't use my own key here */
 }
 
 /* FIREWALL -------------------------------------*/
@@ -125,9 +123,9 @@ variable "open_udp_ports" {
   default     = []
 }
 
-/* See: https://www.terraform.io/docs/providers/alicloud/d/security_group_rules.html */
 variable "blocked_ips" {
   description = "List of source IP ranges for which we want to block access."
   type        = list(string)
   default     = []
+  /* https://www.terraform.io/docs/providers/alicloud/d/security_group_rules.html */
 }

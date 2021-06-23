@@ -6,16 +6,16 @@ locals {
   dc     = "${var.provider_name}-${var.zone}"
   /* convert ports to port ranges, as requried by port_range argument */
   tcp_ports = [
-    for port in var.open_tcp_ports:
-    (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}" )
+    for port in var.open_tcp_ports :
+    (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}")
   ]
   udp_ports = [
-    for port in var.open_udp_ports:
-    (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}" )
+    for port in var.open_udp_ports :
+    (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}")
   ]
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
   open_tcp_ports = concat(["22/22", "655/655", "8000/8000", "8301/8301"], local.tcp_ports)
-  open_udp_ports = concat(["51820/51820", "655/655","8301/8301"], local.udp_ports)
+  open_udp_ports = concat(["51820/51820", "655/655", "8301/8301"], local.udp_ports)
 }
 
 /* RESOURCES ------------------------------------*/
@@ -96,7 +96,7 @@ resource "alicloud_instance" "host" {
 
   /* Ignore changes to disk image */
   lifecycle {
-    ignore_changes = [ image_id ]
+    ignore_changes = [image_id]
   }
 
   /* costs */
