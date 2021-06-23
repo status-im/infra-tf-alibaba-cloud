@@ -20,16 +20,6 @@ locals {
 
 /* RESOURCES ------------------------------------*/
 
-/* default vpc to avoid creating by hand */
-data "alicloud_vpcs" "host" {
-  is_default = true
-}
-
-/* default vswitch to avoid creating by hand */
-data "alicloud_vswitches" "host" {
-  is_default = true
-}
-
 resource "alicloud_security_group" "host" {
   name        = "sg-${var.env}-${local.stage}"
   description = "Sec Group via Terraform"
@@ -70,6 +60,16 @@ resource "alicloud_security_group_rule" "blocked_ips" {
   count             = length(var.blocked_ips)
 }
 
+/* default vpc to avoid creating by hand */
+data "alicloud_vpcs" "host" {
+  is_default = true
+}
+
+/* default vswitch to avoid creating by hand */
+data "alicloud_vswitches" "host" {
+  is_default = true
+}
+
 data "alicloud_images" "host" {
   name_regex = var.image_regex
 }
@@ -89,7 +89,6 @@ resource "alicloud_instance" "host" {
   }
 
   key_name             = var.key_pair
-  availability_zone    = var.zone
   instance_type        = var.type
   system_disk_category = var.disk
   count                = var.host_count
@@ -107,13 +106,13 @@ resource "alicloud_instance" "host" {
 
 /* Optional resource when data_vol_size is set */
 resource "alicloud_disk" "host" {
-  # cn-beijing
-  availability_zone = var.zone
-  name              = "data.${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
-  description       = "Extra data volume created by Terraform."
-  category          = "cloud_ssd"
-  size              = var.data_vol_size
-  count             = var.data_vol_size > 0 ? var.host_count : 0
+  disk_name   = "data.${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
+  description = "Extra data volume created by Terraform."
+  category    = "cloud_ssd"
+
+  size    = var.data_vol_size
+  count   = var.data_vol_size > 0 ? var.host_count : 0
+  zone_id = data.alicloud_vswitches.host.vswitches[0].zone_id
 
   tags = {
     stage = local.stage
