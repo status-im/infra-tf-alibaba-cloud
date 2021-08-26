@@ -13,8 +13,8 @@ locals {
     for port in var.open_udp_ports :
     (replace(port, "-", "/") != port ? replace(port, "-", "/") : "${port}/${port}")
   ]
-  /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_tcp_ports = concat(["22/22", "655/655", "8000/8000", "8301/8301"], local.tcp_ports)
+  /* always add SSH, Tinc, and Consul to allowed ports */
+  open_tcp_ports = concat(["22/22", "655/655", "8301/8301"], local.tcp_ports)
   open_udp_ports = concat(["51820/51820", "655/655", "8301/8301"], local.udp_ports)
 }
 
