@@ -1,6 +1,5 @@
 locals {
-  public_ips = alicloud_eip.host.*.ip_address
-  hostnames  = alicloud_instance.host.*.host_name
+  public_ips = [ for h in alicloud_eip.host : h.ip_address ]
 }
 
 output "public_ips" {
