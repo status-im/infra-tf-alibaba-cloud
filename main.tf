@@ -147,22 +147,33 @@ resource "alicloud_eip" "host" {
   }
 }
 
-/**
- * WARNING: This is broken when instance has a public_ip
- * https://www.alibabacloud.com/help/doc-detail/72125.htm
- * "The ECS instance does not have a public IP, nor is it bound to any EIP."
- * https://www.terraform.io/docs/providers/alicloud/r/eip_association.html
- **/
 resource "alicloud_eip_association" "host" {
   for_each = alicloud_instance.host
 
   allocation_id = alicloud_eip.host[each.key].id
   instance_id   = each.value.id
+}
 
-  /**
-   * It is necessary to provision here instead of in alicloud_instance
-   * because Alibaba Cloud instances do not have public IPs by default
-   **/
+resource "null_resource" "host" {
+  for_each = alicloud_instance.host
+
+  /* Trigger bootstrapping on host or public IP change. */
+  triggers = {
+    instance_id = each.value.id
+    eip_id = alicloud_eip.host[each.key].id
+  }
+
+  /* Make sure everything is in place before bootstrapping. */
+  depends_on = [
+    alicloud_instance.host,
+    alicloud_disk.host,
+    alicloud_disk_attachment.host,
+    alicloud_eip.host,
+    alicloud_eip_association.host
+  ]
+
+  /* It is necessary to provision here instead of in alicloud_instance
+   * because Alibaba Cloud instances do not have public IPs by default */
   provisioner "ansible" {
     connection {
       host = alicloud_eip.host[each.key].ip_address
