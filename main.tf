@@ -175,17 +175,12 @@ resource "null_resource" "host" {
   /* It is necessary to provision here instead of in alicloud_instance
    * because Alibaba Cloud instances do not have public IPs by default */
   provisioner "ansible" {
-    connection {
-      host = alicloud_eip.host[each.key].ip_address
-      user = var.ssh_user
-    }
-
     plays {
       playbook {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
 
-      hosts  = [each.value.public_ip]
+      hosts  = [alicloud_eip.host[each.key].ip_address]
       groups = [var.group]
 
       extra_vars = {
