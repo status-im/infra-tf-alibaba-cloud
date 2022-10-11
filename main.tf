@@ -99,7 +99,8 @@ resource "alicloud_instance" "host" {
 
   key_name             = var.key_pair
   instance_type        = var.type
-  system_disk_category = var.disk
+  system_disk_category = var.root_vol_type
+  system_disk_size     = var.root_vol_size
 
   /* Ignore changes to disk image */
   lifecycle {

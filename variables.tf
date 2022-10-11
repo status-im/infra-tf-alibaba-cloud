@@ -32,8 +32,14 @@ variable "zone" {
   default     = "cn-hongkong-c"
 }
 
-variable "disk" {
-  description = "Disk I/O optimization type."
+variable "root_vol_size" {
+  description = "Size of the root volume."
+  type        = number
+  default     = 10 /* 0 should default to size of base image */
+}
+
+variable "root_vol_type" {
+  description = "I/O optimization type of root volume."
   type        = string
   default     = "cloud_ssd"
 }
