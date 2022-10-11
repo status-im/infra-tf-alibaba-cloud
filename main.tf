@@ -119,10 +119,10 @@ resource "alicloud_disk" "host" {
 
   disk_name   = "data.${each.key}"
   description = "Extra data volume created by Terraform."
-  category    = "cloud_ssd"
 
-  size    = var.data_vol_size
-  zone_id = data.alicloud_vswitches.host.vswitches[0].zone_id
+  size     = var.data_vol_size
+  category = var.data_vol_type
+  zone_id  = data.alicloud_vswitches.host.vswitches[0].zone_id
 
   tags = {
     stage = local.stage

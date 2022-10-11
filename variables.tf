@@ -44,16 +44,22 @@ variable "root_vol_type" {
   default     = "cloud_ssd"
 }
 
-variable "max_band_out" {
-  description = "Maximum outgoing bandwidth to the public network, measured in Mbps."
-  type        = number
-  default     = 50
-}
-
 variable "data_vol_size" {
   description = "Size in GiB of an extra data volume to attach to the instance."
   type        = number
   default     = 0
+}
+
+variable "data_vol_type" {
+  description = "I/O optimization type of extra data volume."
+  type        = string
+  default     = "cloud_efficiency"
+}
+
+variable "max_band_out" {
+  description = "Maximum outgoing bandwidth to the public network, measured in Mbps."
+  type        = number
+  default     = 50
 }
 
 /* GENERAL --------------------------------------*/
