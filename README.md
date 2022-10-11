@@ -22,7 +22,7 @@ module "alibaba-cloud" {
   * `zone` - Specific zone in which to deploy hosts. (default: `cn-hongkong-c`)
   * `max_band_out` - Maximum outgoing bandwidth to the public network, measured in Mbps. (default: `30`)
   * `root_vol_type` - I/O optimization type of root volume. (default: `cloud_ssd`)
-  * `root_vol_size` - Size in GiB of system root volume. (default: 10 GB)
+  * `root_vol_size` - Size in GiB of system root volume. (default: `20`)
   * `data_vol_type` - I/O optimization type of extra data volume. (default: `cloud_efficiency`)
   * `data_vol_size` - Size in GiB of an extra data volume to attach to the instance. (default: 0)
 * __Billing__

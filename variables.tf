@@ -35,7 +35,7 @@ variable "zone" {
 variable "root_vol_size" {
   description = "Size of the root volume."
   type        = number
-  default     = 10 /* 0 should default to size of base image */
+  default     = 20 /* 0 should default to size of base image */
 }
 
 variable "root_vol_type" {
