@@ -104,7 +104,7 @@ resource "alicloud_instance" "host" {
 
   /* Ignore changes to disk image */
   lifecycle {
-    ignore_changes = [image_id, key_name]
+    ignore_changes = [image_id, key_name, system_disk_size]
   }
 
   /* costs */
