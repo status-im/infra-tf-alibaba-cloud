@@ -118,7 +118,7 @@ variable "ssh_user" {
 variable "key_pair" {
   description = "SSH key pair used to log in to instance"
   type        = string
-  default     = "jakub_status.im" /* TODO: I really shouldn't use my own key here */
+  default     = "jakubgs" /* TODO: I really shouldn't use my own key here */
 }
 
 /* FIREWALL -------------------------------------*/
