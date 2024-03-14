@@ -33,10 +33,12 @@ module "alibaba-cloud" {
   * `group` - Name of Ansible group to add hosts to.
   * `env` - Environment for these hosts, affects DNS entries.
   * `stage` - Name of stage, like `prod`, `dev`, or `staging`.
-  * `domain` - DNS Domain to update.
 * __Security__
   * `ssh_user` - User used to log in to instance (default: `root`)
   * `key_pair` - SSH key pair used to log in to instance. (default: `jakub_status.im`)
   * `open_tcp_ports` - TCP port ranges to enable access from outside. Format: `N-N` (default: `[]`)
   * `open_udp_ports` - UDL port ranges to enable access from outside. Format: `N-N` (default: `[]`)
   * `blocked_ips` - List of blocked IP ranges. Format: [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) (default: `[]`)
+* __DNS__
+  * `cf_zone_id` - CloudFlare DNS domain zone ID. (ID for `status.im`)
+  * `domain` - DNS Domain for hostnames. (default: `status.im`)
