@@ -4,7 +4,7 @@ terraform {
   required_providers {
     alicloud = {
       source  = "aliyun/alicloud"
-      version = "= 1.159.0"
+      version = "= 1.219.0"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
