@@ -97,7 +97,12 @@ resource "alicloud_instance" "host" {
     env   = var.env
   }
 
-  key_name             = var.key_pair
+  user_data = base64encode(join("\n", flatten([
+    "#cloud-config",
+    "ssh_authorized_keys:",
+    [for key in var.ssh_keys : "  - ${key}"]
+  ])))
+
   instance_type        = var.type
   system_disk_category = var.root_vol_type
   system_disk_size     = var.root_vol_size
