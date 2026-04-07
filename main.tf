@@ -25,9 +25,9 @@ locals {
 /* RESOURCES ------------------------------------*/
 
 resource "alicloud_security_group" "host" {
-  name        = "sg-${var.env}-${local.stage}"
-  description = "Sec Group via Terraform"
-  vpc_id      = data.alicloud_vpcs.host.vpcs[0].id
+  security_group_name = "sg-${var.env}-${local.stage}"
+  description         = "Sec Group via Terraform"
+  vpc_id              = data.alicloud_vpcs.host.vpcs[0].id
 }
 
 /* WARNING: Using 'all' protocol fucks with port_range option */
