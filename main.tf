@@ -112,9 +112,11 @@ resource "alicloud_instance" "host" {
     ignore_changes = [image_id, key_name, system_disk_size]
   }
 
-  /* costs */
-  instance_charge_type = var.charge
-  period_unit          = var.period
+  /* Billing */
+  instance_charge_type = var.instance_charge_type
+  internet_charge_type = var.internet_charge_type
+  period_unit          = var.period_unit
+
   /* NOTE: We provision inside Elastic IP association */
 }
 
@@ -146,7 +148,9 @@ resource "alicloud_disk_attachment" "host" {
 resource "alicloud_eip" "host" {
   for_each = alicloud_instance.host
 
-  bandwidth = var.max_band_out
+  /* Billing */
+  bandwidth            = var.max_band_out
+  internet_charge_type = var.internet_charge_type
 
   lifecycle {
     prevent_destroy = true

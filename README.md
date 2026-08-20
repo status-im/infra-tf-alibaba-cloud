@@ -26,8 +26,9 @@ module "alibaba-cloud" {
   * `data_vol_type` - I/O optimization type of extra data volume. (default: `cloud_efficiency`)
   * `data_vol_size` - Size in GiB of an extra data volume to attach to the instance. (default: 0)
 * __Billing__
-  * `charge` - Way in which the instance is paid for. (default: `PostPaid`)
-  * `period` - Time period in which we pay for instances. (default: `Month`)
+  * `period_unit` - Time period in which we pay for instances. (default: `Month`)
+  * `instance_charge_type` - Way in which the instance is paid for. (default: `PostPaid`)
+  * `internet_charge_type` - Internet usage by provisioned bandwidth or actual outbound traffic. (default: `PayByTraffic`)
 * __General__
   * `name` - Prefix of hostname before index. (default: `node`)
   * `group` - Name of Ansible group to add hosts to.

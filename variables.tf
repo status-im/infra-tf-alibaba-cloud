@@ -65,7 +65,27 @@ variable "data_vol_type" {
 variable "max_band_out" {
   description = "Maximum outgoing bandwidth to the public network, measured in Mbps."
   type        = number
-  default     = 50
+  default     = 50 # Mbps
+}
+
+/* BILLING --------------------------------------*/
+
+variable "period_unit" {
+  description = "Time period in which we pay for instances."
+  type        = string
+  default     = "Month" /* Other: Week */
+}
+
+variable "instance_charge_type" {
+  description = "Way in which the instance is paid for."
+  type        = string
+  default     = "PostPaid" /* Other: PrePaid */
+}
+
+variable "internet_charge_type" {
+  description = "Public Internet usage by provisioned bandwidth or actual outbound traffic."
+  type        = string
+  default     = "PayByTraffic" # Or PayByBandwidth
 }
 
 /* GENERAL --------------------------------------*/
@@ -80,18 +100,6 @@ variable "name" {
   description = "Prefix of hostname before index."
   type        = string
   default     = "node"
-}
-
-variable "charge" {
-  description = "Way in which the instance is paid for."
-  type        = string
-  default     = "PostPaid" /* Other: PrePaid */
-}
-
-variable "period" {
-  description = "Time period in which we pay for instances."
-  type        = string
-  default     = "Month" /* Other: Week */
 }
 
 variable "group" {
