@@ -62,6 +62,12 @@ variable "data_vol_type" {
   default     = "cloud_efficiency"
 }
 
+variable "elastic_ip" {
+  description = "Whether instance received n Elastic IP."
+  type        = bool
+  default     = false
+}
+
 variable "max_band_out" {
   description = "Maximum outgoing bandwidth to the public network, measured in Mbps."
   type        = number

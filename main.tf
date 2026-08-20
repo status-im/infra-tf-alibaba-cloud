@@ -113,9 +113,10 @@ resource "alicloud_instance" "host" {
   }
 
   /* Billing */
-  instance_charge_type = var.instance_charge_type
-  internet_charge_type = var.internet_charge_type
-  period_unit          = var.period_unit
+  internet_max_bandwidth_out = var.elastic_ip ? 0 : var.max_band_out
+  instance_charge_type       = var.instance_charge_type
+  internet_charge_type       = var.internet_charge_type
+  period_unit                = var.period_unit
 
   /* NOTE: We provision inside Elastic IP association */
 }
@@ -146,7 +147,7 @@ resource "alicloud_disk_attachment" "host" {
 }
 
 resource "alicloud_eip" "host" {
-  for_each = alicloud_instance.host
+  for_each = var.elastic_ip ? alicloud_instance.host : {}
 
   /* Billing */
   bandwidth            = var.max_band_out
@@ -158,7 +159,7 @@ resource "alicloud_eip" "host" {
 }
 
 resource "alicloud_eip_association" "host" {
-  for_each = alicloud_instance.host
+  for_each = var.elastic_ip ? alicloud_instance.host : {}
 
   allocation_id = alicloud_eip.host[each.key].id
   instance_id   = each.value.id
@@ -170,7 +171,7 @@ resource "null_resource" "host" {
   /* Trigger bootstrapping on host or public IP change. */
   triggers = {
     instance_id = each.value.id
-    eip_id = alicloud_eip.host[each.key].id
+    eip_id = try(alicloud_eip.host[each.key].id, "")
   }
 
   /* Make sure everything is in place before bootstrapping. */
@@ -190,7 +191,7 @@ resource "null_resource" "host" {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
 
-      hosts  = [alicloud_eip.host[each.key].ip_address]
+      hosts  = [try(alicloud_eip.host[each.key].ip_address, each.value.public_ip)]
       groups = [var.group]
 
       extra_vars = {
@@ -205,11 +206,11 @@ resource "null_resource" "host" {
 }
 
 resource "cloudflare_record" "host" {
-  for_each = alicloud_eip.host
+  for_each = alicloud_instance.host
 
   zone_id = var.cf_zone_id
   name    = each.key
-  value   = each.value.ip_address
+  value   = try(alicloud_eip.host[each.key].ip_address, each.value.public_ip)
   type    = "A"
   ttl     = 3600
 }
@@ -222,7 +223,7 @@ resource "ansible_host" "host" {
   groups = ["${var.env}.${local.stage}", var.group, local.dc]
 
   vars = {
-    ansible_host = alicloud_eip.host[each.key].ip_address
+    ansible_host = try(alicloud_eip.host[each.key].ip_address, each.value.public_ip)
     hostname     = each.key
     region       = each.value.availability_zone
     dns_entry    = "${each.key}.${var.domain}"

@@ -20,11 +20,12 @@ module "alibaba-cloud" {
   * `image_regex` - Regex for image used to create host. (default: `ubuntu_20_04_x64_20G_alibase_.*.vhd`)
   * `type` - Type of machine to deploy. (default: `ecs.t5-lc2m1.nano`)
   * `zone` - Specific zone in which to deploy hosts. (default: `cn-hongkong-c`)
-  * `max_band_out` - Maximum outgoing bandwidth to the public network, measured in Mbps. (default: `30`)
   * `root_vol_type` - I/O optimization type of root volume. (default: `cloud_ssd`)
   * `root_vol_size` - Size in GiB of system root volume. (default: `20`)
   * `data_vol_type` - I/O optimization type of extra data volume. (default: `cloud_efficiency`)
   * `data_vol_size` - Size in GiB of an extra data volume to attach to the instance. (default: 0)
+  * `max_band_out` - Maximum outgoing bandwidth to the public network, measured in Mbps. (default: `30`)
+  * `elastic_ip` - Whether instance received n Elastic IP. (default: `false`)
 * __Billing__
   * `period_unit` - Time period in which we pay for instances. (default: `Month`)
   * `instance_charge_type` - Way in which the instance is paid for. (default: `PostPaid`)
